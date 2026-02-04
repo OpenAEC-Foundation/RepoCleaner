@@ -25,10 +25,10 @@ jobs:
       issues: write
 
     steps:
-      - name: Checkout RepoCleaner
+      - name: Checkout repo-cleaner
         uses: actions/checkout@v4
         with:
-          repository: OpenAEC-Foundation/RepoCleaner
+          repository: OpenAEC-Foundation/repo-cleaner
           path: repo-cleaner
 
       - name: Set up Python
