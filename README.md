@@ -1,59 +1,50 @@
-# OpenAEC Foundation - Repository License Manager
+# OpenAEC Foundation - Convention Enforcer
 
-This directory contains tools to apply the LGPL 3.0 license to all repositories in the OpenAEC-Foundation GitHub organization.
+Automatically checks and fixes coding conventions across OpenAEC-Foundation repositories.
 
-## Contents
+## What it does
 
-- **LICENSE.md** - The complete LGPL 3.0 license text (includes GPL 3.0 + LGPL additions)
-- **apply_license.sh** - Script to apply the license via GitHub API (fast, no cloning needed)
+- Fetches conventions from `OpenAEC-Foundation/conventions`
+- Checks repositories for convention violations
+- Automatically fixes violations where possible (with `--fix-*` flags)
+- Flags complex cases for manual review
+- Creates/updates a pinned GitHub issue in `.github` repo tracking all violations (check mode only)
 
-## Prerequisites
+## Current features
 
-1. Install GitHub CLI: https://cli.github.com/
-2. Install jq (JSON processor): `sudo apt install jq` or `brew install jq`
-3. Authenticate with GitHub:
-   ```bash
-   gh auth login
-   ```
-4. Ensure you have write access to the OpenAEC-Foundation repositories
+- Repository naming conventions (kebab-case, max 3 segments)
+- License management (LGPL 3.0)
+- String case conversion utility
 
 ## Usage
 
-Apply the license to all repositories:
-
+Check conventions:
 ```bash
-./apply_license.sh
+./repo_conventions_enforcer.py --repo-naming          # Check all repos
+./repo_conventions_enforcer.py --repo-naming --single-repo RepoCleaner  # Check one repo
+./repo_conventions_enforcer.py --licenses             # Check licenses
 ```
 
-Dry run to see what would be changed without making changes:
+Fix violations (⚠️ DANGEROUS - modifies repositories):
 ```bash
-./apply_license.sh --dry-run
+./repo_conventions_enforcer.py --fix-repo-naming      # Rename repos to fix naming
+./repo_conventions_enforcer.py --fix-licenses         # Apply/update licenses
 ```
 
-## How it works
+**Warning**: `--fix-*` flags modify repositories directly. Always run check-only mode first and review the changes carefully before using fix mode.
 
-1. Fetches all repositories from the OpenAEC-Foundation organization
-2. For each repository:
-   - Checks if LICENSE.md already exists via GitHub API
-   - If it exists, downloads and compares content with local LICENSE.md
-   - **Skips if identical** (won't create duplicate commits)
-   - If different or missing, creates/updates via API
-   - Commits directly to the default branch (no cloning needed)
-3. Provides a summary of successes, skips, and failures
+Convert strings:
+```bash
+./repo_conventions_enforcer.py --string-naming kebab-case "OpenPDFStudio"
+```
 
-**Advantages:**
-- Very fast (uses GitHub API, no cloning)
-- No disk space needed
-- Handles large repositories efficiently
-- Smart skipping prevents duplicate commits
+## Prerequisites
 
-## Notes
-
-- **Automatic skipping:** Repositories with an identical LICENSE.md are automatically skipped
-- Empty repositories are skipped
-- Each repository is processed sequentially
-- Failed operations are reported in the summary
+- Python 3.11+
+- GitHub CLI: https://cli.github.com/
+- Dependencies: `pip install pyyaml`
+- Authenticated: `gh auth login`
 
 ## License
 
-This tooling applies the GNU Lesser General Public License v3.0 (LGPL-3.0) to all OpenAEC-Foundation repositories.
+LGPL 3.0
