@@ -1,0 +1,48 @@
+name: Check Conventions (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      repo_name:
+        description: 'Repository name to check'
+        required: true
+        type: string
+      org:
+        description: 'Organization name'
+        required: false
+        type: string
+        default: 'OpenAEC-Foundation'
+    secrets:
+      gh_token:
+        description: 'GitHub token for gh CLI'
+        required: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout RepoCleaner
+        uses: actions/checkout@v4
+        with:
+          repository: OpenAEC-Foundation/RepoCleaner
+          path: repo-cleaner
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pyyaml
+
+      - name: Check repository conventions
+        working-directory: repo-cleaner
+        env:
+          GH_TOKEN: ${{ secrets.gh_token }}
+        run: |
+          python3 repo_conventions_enforcer.py --repo-naming --single-repo "${{ inputs.repo_name }}" --org "${{ inputs.org }}"
